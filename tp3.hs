@@ -1,3 +1,7 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant lambda" #-}
+{-# HLINT ignore "Collapse lambdas" #-}
+{-# HLINT ignore "Use bimap" #-}
 
 doble :: Int -> Int
 doble x = x + x
@@ -93,10 +97,16 @@ appPar = \(f,g) -> \(x,y) -> (f x, g y)
 appDist f = g
     where g (x, y) = (f x, g y)
 -}
-
+appDist :: (a -> b) -> (a,a) -> (b,b)
+appDist = \f -> \(x,y) -> (f x, f y)
 --e.
 {-
 subst f = h
     where h g = k
         where k x = (f x) (g x)
 -}
+subst :: (a -> b) -> (a -> c) -> a -> (b,c)
+subst = \f -> \g -> \x -> (f x, g x)
+
+
+-- 6)
