@@ -1,0 +1,51 @@
+data Pizza = Prepizza | Capa Ingrediente Pizza
+
+data Ingrediente = Aceitunas Int | Anchoas | Cebolla
+| Jamón | Queso | Salsa
+
+
+--a
+cantidadDeCapas :: Pizza -> Int
+cantidadDeCapas Prepizza        = 0
+cantidadDeCapas (Capa i p)  = cantidadDeIngrediente + cantidadDeCapas p
+
+cantidadDeIngrediente :: Ingrediente -> Int
+cantidadDeIngrediente (Aceitunas i) = i
+cantidadDeIngrediente i = 1
+
+
+--b
+cantidadDeAceitunas :: Pizza -> Int
+cantidadDeAceitunas Prepizza    = 0
+cantidadDeAceitunas (Capa i p)  = cantAceitunasEnCapa i + cantidadDeAceitunas p
+
+
+cantAceitunasEnCapa :: Ingrediente -> Int
+cantAceitunasEnCapa (Aceitunas i) = int
+cantAceitunasEnCapa _ = 0
+
+--c
+duplicarAceitunas :: Pizza -> Pizza
+duplicarAceitunas (Capa i p)    = (Capa (duplicarAceitunasEnCapa i) p) 
+duplicarAceitunas p             = p
+
+duplicarAceitunasEnCapa :: Ingrediente -> Ingrediente
+duplicarAceitunasEnCapa (Aceitunas i)   = (Aceitunas i*2)
+duplicarAceitunasEnCapa i               = i
+
+--d
+sinLactosa :: Pizza -> Pizza
+sinLactosa Prepizza = Prepizza
+sinLactosa (Capa i c) = Case i of 
+                        Queso   -> sinLactosa c
+                        p       -> (Capa i (sinLactosa c)) 
+
+--e
+aptaIntolerantesLactosa :: Pizza -> Bool
+aptaIntolerantesLactosa Prepizza    = True
+aptaIntolerantesLactosa (Capa i c)  = esQueso i || aptaIntolerantesLactosa c
+
+esQueso :: Ingrediente -> Bool
+esQueso Queso   = True
+esQueso p       = False
+

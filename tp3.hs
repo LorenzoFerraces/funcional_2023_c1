@@ -1,4 +1,5 @@
 {-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+import Prelude hiding (id)
 {-# HLINT ignore "Redundant lambda" #-}
 {-# HLINT ignore "Collapse lambdas" #-}
 {-# HLINT ignore "Use bimap" #-}
@@ -29,7 +30,7 @@ id :: a -> a
 id x = x 
 
 -- d.
-flip :: (a -> (b -> c)) -> (b -> (a -> c))
+flip :: (a -> b -> c) -> b -> a -> c
 flip f x y = f y x 
 
 -- e.
@@ -110,3 +111,17 @@ subst = \f -> \g -> \x -> (f x, g x)
 
 
 -- 6)
+
+--a compose fst snd
+
+--b uncurry (curry snd)
+
+--d no se
+
+
+
+-- 7)
+
+many :: Int -> (a -> a) -> a -> a 
+many 0 f x = x
+many n f x = many (n-1) f (compose id f x) 
