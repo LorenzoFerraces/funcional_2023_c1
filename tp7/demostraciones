@@ -1,0 +1,42 @@
+4.a
+cantAcs Pp = cantAcs(conDescM Pp)
+
+    cantAcs Pp 
+  =             (def de cantAcs, con p = Pp)
+    [0]
+
+
+
+
+    cantAcs(conDescM Pp)
+  =                      (def de conDescM, con p = Pp)
+    cantAcs Pp
+  =              (def de cantAcs, con p = Pp)`
+    [0]
+
+------------------------------------------------------------------------------
+
+4.b
+cantAcs (C Q Pp) = cantAcs (conDescM (C Q Pp))
+
+    cantAcs (C Q Pp)
+  =                 (def de cantAcs, con p = (C Q Pp))
+    cantAcsEnC Q + cantAcs Pp
+  =                           (def de cantAcsEnC, con i != Ac)
+    0 + cantAcs Pp
+  =                 (def de cantAcs, con p = Pp)
+    0 + 0
+  =       (arit.)
+    [0]
+
+
+
+    cantAcs (conDescM (C Q Pp))
+  =                             (def de conDescM, con p = (C Q Pp))
+    cantAcs (juntarAcs Q conDescM Pp)
+  =                                   (def de conDescM, con p = Pp)
+    cantAcs (juntarAcs Q Pp)
+  =                          (def de juntarAcs, con i = Q, p = Pp)
+    cantAcs (C Q Pp)
+  =                 (lema)
+    [0]
