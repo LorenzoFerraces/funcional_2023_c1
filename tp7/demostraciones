@@ -3,8 +3,7 @@ cantAcs Pp = cantAcs(conDescM Pp)
 
     cantAcs Pp 
   =             (def de cantAcs, con p = Pp)
-    [0]
-
+   [0]
 
 
 
@@ -12,7 +11,7 @@ cantAcs Pp = cantAcs(conDescM Pp)
   =                      (def de conDescM, con p = Pp)
     cantAcs Pp
   =              (def de cantAcs, con p = Pp)`
-    [0]
+   [0]
 
 ------------------------------------------------------------------------------
 
@@ -27,7 +26,7 @@ cantAcs (C Q Pp) = cantAcs (conDescM (C Q Pp))
   =                 (def de cantAcs, con p = Pp)
     0 + 0
   =       (arit.)
-    [0]
+   [0]
 
 
 
@@ -38,5 +37,93 @@ cantAcs (C Q Pp) = cantAcs (conDescM (C Q Pp))
     cantAcs (juntarAcs Q Pp)
   =                          (def de juntarAcs, con i = Q, p = Pp)
     cantAcs (C Q Pp)
-  =                 (lema)
-    [0]
+  =                 (demostrado previamente) --buscar como definir
+   [0]
+
+
+------------------------------------------------------------------------------
+
+4.c
+
+cantAcs (C (Ac 8) (C Q Pp)) = cantAcs (conDescM (C (Ac 8) (C Q Pp)))
+
+    cantAcs (C (Ac 8) (C Q Pp))
+  =                             (def de cantAcs, con p = (C (Ac 8) (C Q Pp)))
+    cantAcsEnC (Ac 8) + cantAcs (C Q Pp)
+  =                                     (def de cantAcsEnC, con i = (Ac 8))
+    8 + cantAcs (C Q Pp)   
+  =                     (def de cantAcs, con p = (C Q Pp))
+    8 + (cantAcsEnC Q + cantAcs Pp)
+  =                                 (def de cantAcsEnC, con i = Q)
+    8 + (0 + cantAcs Pp)
+  =                     (def de cantAcs, con p = Pp)
+    8 + (0 + 0)
+  =             (arit.)
+   [8]
+
+
+
+    cantAcs (conDescM (C (Ac 8) (C Q Pp)))
+  =                                       (def de conDescM, con p = (C (Ac 8) (C Q Pp)))
+    cantAcs (juntarAcs (Ac 8) (conDescM (C Q Pp)))
+  =                                                    (def de conDescM, con p = (C Q Pp))
+    cantAcs (juntarAcs (Ac 8) (C Q Pp))
+  =                                     (def de juntarAcs, con i = (Ac 8), p = (C Q Pp))
+    cantAcs (if esAceituna (Ac 8) && esAceituna Q)
+      ----- no se como seguir con el if ----------------
+
+
+
+
+
+
+
+
+
+
+///////////////////////////////////////////////////////////////////////////////////////
+
+* Seccion 2 *
+
+4.a 
+para todo p :: Planilla
+lenPlan (JuntPlan Fin p) = lenPlan Fin + LenPlan p
+
+sea p' una planilla cualquiera.
+lenPlan (JuntPlan Fin p') = lenPlan Fin + LenPlan p'
+
+    lenPlan (JuntPlan Fin p') 
+  =                           (def JuntPlan.1, con p1 = Fin, p2 = p')
+   [lenPlan p']
+
+
+
+    lenPlan Fin + lenPlan p'
+  =                         (def lenPlan.1, con p = Fin)
+    0 + lenPlan p'
+  =               (arit.)
+   [lenPlan p']
+
+
+------------------------------------------------------------------------------
+
+4.b
+para todo p :: Planilla
+lenPlan (JuntPlan (Reg "Edsger" Fin) p) = LenPlan (Reg "Edsger" Fin) + lenPlan p
+
+sea p' una planilla cualquiera
+lenPlan (JuntPlan (Reg "Edsger" Fin) p') = LenPlan (Reg "Edsger" Fin) + lenPlan p'
+
+    lenPlan (JuntPlan (Reg "Edsger" Fin) p')
+  =                                         (def JuntPlan.3, con p1 = (Reg "Edsger" Fin), p2 = p')
+    lenPlan (Reg "Edsger" (JuntPlan Fin p'))
+  =                                         (def JuntPlan.1, con p1 = Fin, p2 = p')
+    lenPlan (Reg "Edsger" p')
+  =                           (def lenPlan.2, con p = (Red "Edsger" p'))
+   [1 + lenPlan p']
+
+
+
+    LenPlan (Reg "Edsger" Fin) + lenPlan p'
+  =                                         (demostrado previamente) --buscar como definir
+   [1 + lenPlan p']

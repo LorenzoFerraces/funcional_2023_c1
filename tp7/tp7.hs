@@ -129,8 +129,9 @@ esta n (Registro n2 p)   = n == n2 || esta n p
 
 --c
 juntarPlanillas :: Planilla -> Planilla -> Planilla
-juntarPlanillas (Registro n p) p2   = juntarPlanillas p (Registro n p2)
 juntarPlanillas Fin            p2   = p2
+juntarPlanillas p1             Fin  = p1
+juntarPlanillas (Registro n p) p2   = Registro n (juntarPlanillas p p2)
 
 --d
 nivelesJerarquicos :: Equipo -> Int
