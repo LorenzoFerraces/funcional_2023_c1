@@ -38,9 +38,13 @@ duplicarAceitunasEnCapa i               = i
 --d
 sinLactosa :: Pizza -> Pizza
 sinLactosa Prepizza = Prepizza
-sinLactosa (Capa i c) = case i of 
-                        Queso   -> sinLactosa c
-                        p       -> Capa i (sinLactosa c)
+sinLactosa (Capa i c) = if tieneLactosa i
+                        then sinLactosa c
+                        else Capa i (sinLactosa c)
+
+tieneLactosa :: Ingrediente -> Bool
+tieneLactosa Queso  = True
+tieneLactosa _      = False
 
 --e
 aptaIntolerantesLactosa :: Pizza -> Bool
@@ -59,10 +63,8 @@ conDescripcionMejorada (Capa i p)   = juntarAceitunas i (conDescripcionMejorada 
 
 
 juntarAceitunas :: Ingrediente -> Pizza -> Pizza
-juntarAceitunas i Prepizza    = Capa i Prepizza
-juntarAceitunas i1 (Capa i2 p)  = if esAceituna i2 && esAceituna i1
-                                    then Capa (sumarAceitunas i1 i2) p
-                                    else Capa i1 (Capa i2 p)
+juntarAceitunas (Aceitunas a1) (Capa (Aceitunas a2) p)  = Capa (Aceitunas (a1 + a2) ) p     
+juntarAceitunas i               pz                      = Capa i pz 
 
 ingredienteDe :: Pizza -> Ingrediente
 ingredienteDe (Capa i p) = i
@@ -130,7 +132,6 @@ esta n (Registro n2 p)   = n == n2 || esta n p
 --c
 juntarPlanillas :: Planilla -> Planilla -> Planilla
 juntarPlanillas Fin            p2   = p2
-juntarPlanillas p1             Fin  = p1
 juntarPlanillas (Registro n p) p2   = Registro n (juntarPlanillas p p2)
 
 --d
