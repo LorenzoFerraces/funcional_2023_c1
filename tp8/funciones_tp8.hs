@@ -13,7 +13,7 @@ sum []      =   0
 sum (x:xs)  = x + sum xs
 
 product :: [Int] -> Int
-product (x:[])  = x
+product []      = 1
 product (x:xs)  = x * product xs
 
 concat :: [[a]] -> [a]
@@ -56,7 +56,7 @@ zip []      ys    = []
 zip (x:xs) (y:ys) = (x,y) : zip xs ys
 
 unzip :: [(a,b)] -> ([a], [b])
-unzip ((f,sn) : [])  = ([f],[sn])
+unzip []  = ([],[])
 unzip ((f,sn) : ps)  =  let pls = unzip ps in
                         (f:fst pls, sn: snd pls)
 
