@@ -1,3 +1,7 @@
+{-# OPTIONS_GHC -Wno-unrecognised-pragmas #-}
+{-# HLINT ignore "Redundant lambda" #-}
+{-# HLINT ignore "Use foldr" #-}
+{-# HLINT ignore "Use map" #-}
 
 data Pizza = Prepizza | Capa Ingrediente Pizza
     deriving Show
@@ -79,10 +83,10 @@ conCapasTransformadas' f = pizzaProcesada (Capa . f) Prepizza
 
 
 soloLasCapasQue' :: (Ingrediente -> Bool) -> Pizza -> Pizza
-soloLasCapasQue' f = pizzaProcesada (subst capaQueCumple f) Prepizza
+soloLasCapasQue' f = pizzaProcesada (appFork capaQueCumple f) Prepizza
 
-subst :: (a -> b -> c) -> (a -> b) -> a -> c
-subst f g x = f x (g x) 
+appFork :: (a -> b -> c) -> (a -> b) -> a -> c
+appFork f g x = f x (g x) 
 
 capaQueCumple :: Ingrediente -> Bool -> Pizza -> Pizza
 capaQueCumple _ False = id
@@ -102,7 +106,7 @@ aceitunas :: Ingrediente -> Int
 aceitunas (Aceitunas i) = i
 aceitunas _             = 0 
 
-capasQueCumplen f = pizzaProcesada (subst ingredienteQueCumple f) []
+capasQueCumplen f = pizzaProcesada (appFork ingredienteQueCumple f) []
 
 ingredienteQueCumple :: Ingrediente -> Bool -> [Ingrediente] -> [Ingrediente]
 ingredienteQueCumple _ False = id
@@ -131,11 +135,11 @@ primerasNCapas = flip (pizzaProcesada agregarNCapas (const Prepizza))
 
 map2 :: (a -> b) -> [a] -> [b]
 map2 f []    = []
-map2 f (x:xs)= f x : map f xs
+map2 f (x:xs)= f x : map2 f xs
 
 filter2 :: (a -> Bool) -> [a] -> [a]
 filter2 f []     = []
-filter2 f (x:xs) = singularSi x (f x) ++ filter f xs
+filter2 f (x:xs) = singularSi x (f x) ++ filter2 f xs
 
 singularSi :: a -> Bool -> [a]
 singularSi _ False = []
@@ -143,10 +147,43 @@ singularSi x True  = [x]
 
 foldr2 :: (a -> b -> b) -> b -> [a] -> b
 foldr2 f base []     = base
-foldr2 f base (x:xs) = f x (foldr f base xs) 
+foldr2 f base (x:xs) = f x (foldr2 f base xs) 
 
 recr :: b -> (a -> [a] -> b -> b) -> [a] -> b
 recr base f []      = base
 recr base f (x:xs)  = f x xs (recr base f xs)
 
--- recr z f = 
+zipWith2 :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith2 _ [] ys = []
+zipWith2 _ xs [] = []
+zipWith2 f (x:xs) (y:ys) = f x y : zipWith2 f xs ys
+
+scanr2 :: (a -> b -> b) -> b -> [a] -> [b]
+scanr2 _ z []     = [z]
+scanr2 f z (x:xs) = let xs' = scanr2 f z xs  
+                    in f x (head xs') : xs'
+
+
+-- 9)
+
+sum = foldr2 (+) 0
+
+length = foldr2 ((+) . const 1) 0
+
+map3 :: (a -> b) -> [a] -> [b]
+map3 f = foldr2 ((:) . f) [] 
+
+filter3 :: (a -> Bool) -> [a] -> [a]
+filter3 p = foldr2 ((++) . appFork singularSi p) []
+
+find3 :: (a -> Bool) -> [a] -> Maybe a
+find3 p = foldr2 (\x mx-> if p x then Just x else mx ) Nothing
+
+any3 :: (a -> Bool) -> [a] -> Bool
+any3 p = foldr2 ((||) . p) False
+
+all3 :: (a -> Bool) -> [a] -> Bool
+all3 p = foldr2 ((&&) . p) True
+
+countBy :: (a -> Bool) -> [a] -> Int
+countBy p = foldr2 ((+) . (delta . p)) 0
