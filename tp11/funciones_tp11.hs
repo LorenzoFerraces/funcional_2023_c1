@@ -171,10 +171,13 @@ sum = foldr2 (+) 0
 length = foldr2 ((+) . const 1) 0
 
 map3 :: (a -> b) -> [a] -> [b]
-map3 f = foldr2 ((:) . f) [] 
+map3 = flip foldr2 [] . ((:) .)
+-- flip foldr ...
+-- flip foldr [] . ((:) .)
+-- foldr . []
 
 filter3 :: (a -> Bool) -> [a] -> [a]
-filter3 p = foldr2 ((++) . appFork singularSi p) []
+filter3 p = foldr2 ((++) . appFork singularSi p) [] 
 
 find3 :: (a -> Bool) -> [a] -> Maybe a
 find3 p = foldr2 (\x mx-> if p x then Just x else mx ) Nothing
@@ -183,7 +186,7 @@ any3 :: (a -> Bool) -> [a] -> Bool
 any3 p = foldr2 ((||) . p) False
 
 all3 :: (a -> Bool) -> [a] -> Bool
-all3 p = foldr2 ((&&) . p) True
+all3 = flip foldr2 True . ((&&) . )
 
 countBy :: (a -> Bool) -> [a] -> Int
 countBy p = foldr2 ((+) . (delta . p)) 0
