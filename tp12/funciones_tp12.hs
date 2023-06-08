@@ -1,5 +1,8 @@
-import Language.Haskell.TH (Exp)
+
 data ExpA = Cte Int | Suma ExpA ExpA | Prod ExpA ExpA
+    deriving Show
+
+exp = Suma
 
 foldExpA :: (a -> a -> a) -> (a -> a -> a) -> (Int -> a) -> ExpA -> a
 foldExpA f g h (Cte n)        = h n
@@ -34,7 +37,30 @@ simplificarProd' ex1 ex2    = Prod ex1 ex2
 evalExpA' :: ExpA -> Int
 evalExpA' = foldExpA (+) (*) id
 
-showExpA' :: ExpA -> String
-showExpA' foldExpA 
+-- showExpA' :: ExpA -> String
+-- showExpA' foldExpA 
 
+-- cantDeSumaCeros :: ExpA -> Int
+-- cantDeSumaCeros = foldExpA (+) (const (const 0)) (const 1)
+
+-- 3)
+data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
+    deriving Show
+pruebaT = NodeT 5 
+    (NodeT 2 
+        (NodeT 1 
+            (NodeT 0 EmptyT EmptyT) EmptyT) 
+        (NodeT 3 EmptyT 
+            (NodeT 4 EmptyT EmptyT))) 
+    (NodeT 8 
+        (NodeT 7 
+            (NodeT 6 EmptyT EmptyT) EmptyT) 
+        (NodeT 9 EmptyT EmptyT))
+
+foldT :: (a -> b -> b -> b) -> b -> Tree a -> b 
+foldT _ z EmptyT = z
+foldT f z (NodeT x ti td) = f x (foldT f z ti) (foldT f z td)
+
+mapT :: (a -> b) -> Tree a -> Tree b
+mapT f = foldT (NodeT . f) EmptyT
 
