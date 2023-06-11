@@ -1,4 +1,3 @@
-
 data ExpA = Cte Int | Suma ExpA ExpA | Prod ExpA ExpA
     deriving Show
 
@@ -8,6 +7,10 @@ foldExpA :: (a -> a -> a) -> (a -> a -> a) -> (Int -> a) -> ExpA -> a
 foldExpA f g h (Cte n)        = h n
 foldExpA f g h (Suma ex1 ex2) = f (foldExpA f g h ex1) (foldExpA f g h ex2) 
 foldExpA f g h (Prod ex1 ex2) = g (foldExpA f g h ex1) (foldExpA f g h ex2)
+
+foldr2 :: (a -> b -> b) -> b -> [a] -> b
+foldr2 f base []     = base
+foldr2 f base (x:xs) = f x (foldr2 f base xs) 
 
 many :: Int -> (a -> a) -> a -> a 
 many 0 f x = x
@@ -38,7 +41,6 @@ rightTree (NodeT x ti td) = td
 
 root :: Tree a -> a 
 root (NodeT x ti td) = x
-
 
 
 cantidadDeCeros :: ExpA -> Int
@@ -104,8 +106,8 @@ countByT :: (a -> Bool) -> Tree a -> Int
 partitionT :: (a -> Bool) -> Tree a -> ([a], [a])
 zipWithT :: (a->b->c) -> Tree a -> Tree b -> Tree c
 caminoMasLargo :: Tree a -> [a]
--- todosLosCaminos :: Tree a -> [[a]]
--- todosLosNiveles :: Tree a -> [[a]]
+todosLosCaminos :: Tree a -> [[a]]
+todosLosNiveles :: Tree a -> [[a]]
 -- nivelN :: Tree a -> Int -> [a]
 
 sumT = foldT g 0
@@ -146,3 +148,6 @@ caminoMasLargo = foldT masLargo []
     where masLargo x tis tds = case length tis > length tds of
                                     True -> x : tis
                                     _    -> x : tds
+
+todosLosCaminos = foldT agregar []
+    where agregar x tis tds = (foldr2 ((:) . (x:)) [[x]]) (tis ++ tds)
