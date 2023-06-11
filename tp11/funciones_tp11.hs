@@ -201,12 +201,6 @@ partition3 f = foldr2 partir ([], [])
     where partir x pares = case f x of
                             True -> overFst (x:) pares
                             False -> overSnd (x:) pares
- 
-zipWith4 :: (a -> b -> c) -> [a] -> [b] -> [c]
-zipWith4 f = foldr2 combinar (const [])
-    where combinar x g ys = if null ys 
-                                then g []
-                                else f x (head ys) : g (tail ys)
 
 
 

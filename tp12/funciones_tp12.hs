@@ -42,6 +42,18 @@ rightTree (NodeT x ti td) = td
 root :: Tree a -> a 
 root (NodeT x ti td) = x
 
+juntarListas2 :: [[a]] -> [[a]] -> [[a]]
+juntarListas2 = foldr2 concatenar id
+    where concatenar xs rss yss = case null yss of
+                                    True -> xs : rss yss
+                                    _    -> (xs ++ (head yss)) : rss (tail yss) 
+
+zipWith4 :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith4 f = foldr2 combinar (const [])
+    where combinar x g ys = if null ys 
+                                then g []
+                                else f x (head ys) : g (tail ys)
+
 
 cantidadDeCeros :: ExpA -> Int
 cantidadDeCeros = foldExpA (+) (+) (delta . (==0))
@@ -77,16 +89,27 @@ evalExpA' = foldExpA (+) (*) id
 data Tree a = EmptyT | NodeT a (Tree a) (Tree a)
     deriving Show
 pruebaT :: Tree Int
-pruebaT = NodeT 5 
-            (NodeT 2 
-                (NodeT 1 
-                    (NodeT 0 EmptyT EmptyT) EmptyT) 
-                (NodeT 3 EmptyT 
-                    (NodeT 4 EmptyT EmptyT))) 
-            (NodeT 8 
-                (NodeT 7 
-                    (NodeT 6 EmptyT EmptyT) EmptyT) 
-                (NodeT 9 EmptyT EmptyT))
+pruebaT = NodeT 8 
+            (NodeT 5
+                (NodeT 3
+                    (NodeT 1 
+                        EmptyT
+                        (NodeT 2
+                            EmptyT 
+                            EmptyT))
+                    (NodeT 4 
+                        EmptyT
+                        EmptyT))
+                (NodeT 7
+                    (NodeT 6
+                        EmptyT
+                        EmptyT)
+                    EmptyT))
+            (NodeT 10
+                (NodeT 9
+                    EmptyT
+                    EmptyT)
+                EmptyT)
 
 foldT :: (a -> b -> b -> b) -> b -> Tree a -> b 
 foldT _ z EmptyT = z
@@ -108,7 +131,7 @@ zipWithT :: (a->b->c) -> Tree a -> Tree b -> Tree c
 caminoMasLargo :: Tree a -> [a]
 todosLosCaminos :: Tree a -> [[a]]
 todosLosNiveles :: Tree a -> [[a]]
--- nivelN :: Tree a -> Int -> [a]
+nivelN :: Tree a -> Int -> [a]
 
 sumT = foldT g 0
     where g n m l = n + m + l
@@ -151,3 +174,11 @@ caminoMasLargo = foldT masLargo []
 
 todosLosCaminos = foldT agregar []
     where agregar x tis tds = (foldr2 ((:) . (x:)) [[x]]) (tis ++ tds)
+
+todosLosNiveles = foldT juntar []
+    where juntar x tis tds = [x] : juntarListas2 tis tds
+
+nivelN = (foldT tomarNivel (const []))
+    where tomarNivel x tis tds n = case n==0 of 
+                                        True -> [x] 
+                                        _    -> (tis (n-1)) ++ (tds (n-1))
