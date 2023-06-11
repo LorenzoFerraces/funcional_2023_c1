@@ -23,6 +23,18 @@ delta :: Bool -> Int
 delta False = 0 
 delta True  = 1
 
+overFst :: (a -> a) -> (a, b) -> (a , b)
+overFst f (x, y) = (f x , y)
+
+overSnd :: (b -> b) -> (a, b) -> (a , b)
+overSnd f (x, y) = (x , f y)
+
+appPars :: (a -> a -> a) -> (a, a) -> (a, a) -> (a, a)
+appPars f (x,y) (w,z) = (f x w, f y z)
+
+appFork :: (a -> b -> c) -> (a -> b) -> a -> c
+appFork f g x = f x (g x) 
+
 conCapasTransformadas :: (Ingrediente -> Ingrediente) -> Pizza -> Pizza
 conCapasTransformadas _ Prepizza    = Prepizza
 conCapasTransformadas f (Capa i p)  = Capa (f i) (conCapasTransformadas f p)
@@ -85,9 +97,6 @@ conCapasTransformadas' f = pizzaProcesada (Capa . f) Prepizza
 soloLasCapasQue' :: (Ingrediente -> Bool) -> Pizza -> Pizza
 soloLasCapasQue' f = pizzaProcesada (appFork capaQueCumple f) Prepizza
 
-appFork :: (a -> b -> c) -> (a -> b) -> a -> c
-appFork f g x = f x (g x) 
-
 capaQueCumple :: Ingrediente -> Bool -> Pizza -> Pizza
 capaQueCumple _ False = id
 capaQueCumple i True  = Capa i
@@ -124,7 +133,7 @@ conCapasDe = flip (pizzaProcesada Capa)
 -- primerasNCapas = flip (pizzaProcesada agregarNCapas (const Prepizza)) 
 
 primerasNCapas = flip (pizzaProcesada agregarNCapas (const Prepizza))
-    where agregarNCapas x h = \n -> if n==0 then Prepizza else Capa x (h (n-1))
+    where agregarNCapas x h n= if n==0 then Prepizza else Capa x (h (n-1))
 
 -- agregarNCapas recibe un ingrediente y una pizza, 
 -- y devuelve una funcion que dado un numero devuelve una pizza
@@ -154,9 +163,8 @@ recr base f []      = base
 recr base f (x:xs)  = f x xs (recr base f xs)
 
 zipWith2 :: (a -> b -> c) -> [a] -> [b] -> [c]
-zipWith2 _ [] ys = []
-zipWith2 _ xs [] = []
-zipWith2 f (x:xs) (y:ys) = f x y : zipWith2 f xs ys
+zipWith2 _ [] = const []
+zipWith2 f (x:xs) =  (appFork ((:) . ((f x) . head)) (zipWith2 f xs))  
 
 scanr2 :: (a -> b -> b) -> b -> [a] -> [b]
 scanr2 _ z []     = [z]
@@ -172,9 +180,6 @@ length = foldr2 ((+) . const 1) 0
 
 map3 :: (a -> b) -> [a] -> [b]
 map3 = flip foldr2 [] . ((:) .)
--- flip foldr ...
--- flip foldr [] . ((:) .)
--- foldr . []
 
 filter3 :: (a -> Bool) -> [a] -> [a]
 filter3 p = foldr2 ((++) . appFork singularSi p) [] 
@@ -190,3 +195,42 @@ all3 = flip foldr2 True . ((&&) . )
 
 countBy :: (a -> Bool) -> [a] -> Int
 countBy p = foldr2 ((+) . (delta . p)) 0
+
+partition3 :: (a -> Bool) -> [a] -> ([a], [a])
+partition3 f = foldr2 partir ([], [])
+    where partir x pares = case f x of
+                            True -> overFst (x:) pares
+                            False -> overSnd (x:) pares
+ 
+zipWith4 :: (a -> b -> c) -> [a] -> [b] -> [c]
+zipWith4 f = foldr2 combinar (const [])
+    where combinar x g ys = if null ys 
+                                then g []
+                                else f x (head ys) : g (tail ys)
+
+
+
+-- scanr2 :: (a -> b -> b) -> b -> [a] -> [b]
+-- scanr2 _ z []     = [z]
+-- scanr2 f z (x:xs) = let xs' = scanr2 f z xs  
+--                     in f x (head xs') : xs'
+
+scanr3 :: (a -> b -> b) -> b -> [a] -> [b]
+scanr3 f z = foldr2 scan [z]
+    where scan x rs = (f x (head rs)) : rs
+
+takeWhile3 :: (a -> Bool) -> [a] -> [a]
+takeWhile3 f = foldr2 takeif []
+    where takeif x rs = appFork singularSi f x ++ rs
+
+take3 :: Int -> [a] -> [a]
+take3 = flip (foldr2 tomar (const []))
+    where tomar x rs n = case n==0 of
+                            True ->  []
+                            False -> x : rs (n-1)
+
+drop3 :: Int -> [a] -> [a]
+drop3 = flip (foldr2 sacar (const []))
+    where sacar x rs n = case n==0 of
+                            True ->  x : rs 0 
+                            False -> rs (n-1)
