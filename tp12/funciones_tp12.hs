@@ -1,8 +1,6 @@
 data ExpA = Cte Int | Suma ExpA ExpA | Prod ExpA ExpA
     deriving Show
 
-exp = Suma
-
 foldExpA :: (a -> a -> a) -> (a -> a -> a) -> (Int -> a) -> ExpA -> a
 foldExpA f g h (Cte n)        = h n
 foldExpA f g h (Suma ex1 ex2) = f (foldExpA f g h ex1) (foldExpA f g h ex2) 
@@ -115,6 +113,10 @@ foldT :: (a -> b -> b -> b) -> b -> Tree a -> b
 foldT _ z EmptyT = z
 foldT f z (NodeT x ti td) = f x (foldT f z ti) (foldT f z td)
 
+recT :: (a -> Tree a -> Tree a -> b -> b -> b) -> b -> Tree a -> b
+recT _ z EmptyT = z
+recT f z (NodeT x ti td) = f x ti td (recT f z ti) (recT f z td)
+
 mapT :: (a -> b) -> Tree a -> Tree b
 mapT f = foldT (NodeT . f) EmptyT
 
@@ -182,3 +184,60 @@ nivelN = (foldT tomarNivel (const []))
     where tomarNivel x tis tds n = case n==0 of 
                                         True -> [x] 
                                         _    -> (tis (n-1)) ++ (tds (n-1))
+
+
+data GTree a = GNode a [GTree a]
+    deriving Show
+
+gtPrueba :: GTree Int
+gtPrueba = GNode 10 [ GNode 2 [ GNode 5 [], GNode 6 [] ] , GNode 3 [ GNode 7 [] ] , GNode 4 [] ]
+
+
+-- foldGT0 :: (a->[b]->b) -> GTree a -> b
+-- foldGT0 h (GNode x ts) = h x (map (foldGT0 h) ts)
+
+-- sumGT0 :: GTree Int -> Int
+-- sumGT0 = foldGT0 (flip ((+) . sum))
+
+
+-- foldGT1 :: (a->c->b) -> (b->c->c) -> c -> GTree a -> b
+-- foldGT1 g f z (GNode x ts) = g x (foldr f z (map (foldGT1 g f z) ts))
+
+-- sumGT1 :: GTree Int -> Int
+-- sumGT1 = foldGT1 (+) (+) 0
+
+
+foldGT :: (a -> c -> b) -> ([b] -> c) -> GTree a -> b
+foldGT g k (GNode x ts) = g x (k(map (foldGT g k) ts))
+
+
+
+mapGT :: (a -> b) -> GTree a -> GTree b
+sumGT :: GTree Int -> Int
+sizeGT :: GTree a -> Int
+heightGT :: GTree a -> Int
+preOrderGT :: GTree a -> [a]
+postOrderGT :: GTree a -> [a]
+-- mirrorGT :: GTree a -> GTree a
+-- countByGT :: (a -> Bool) -> GTree a -> Int
+-- partitionGT :: (a -> Bool) -> GTree a -> ([a], [a])
+-- zipWithGT :: (a->b->c) -> GTree a -> GTree b -> GTree c
+-- caminoMasLargoGT :: GTree a -> [a]
+-- todosLosCaminosGT :: GTree a -> [[a]]
+-- todosLosNivelesGT :: GTree a -> [[a]]
+-- caminoHastaGT :: Eq a => a -> GTree a -> [a]
+-- nivelNGT :: GTree a -> Int -> [a]
+
+mapGT f = foldGT (GNode . f) id
+
+sumGT = foldGT (+) sum
+
+sizeGT = foldGT ((+) . const 1) sum
+
+heightGT = foldGT ((+) . const 1) (maxOr 0) 
+    where maxOr x [] = 0
+          maxOr x xs = maximum xs
+
+preOrderGT = foldGT (:) concat
+
+postOrderGT = foldGT  ((flip (++)) . (:[])) (concat . reverse)
