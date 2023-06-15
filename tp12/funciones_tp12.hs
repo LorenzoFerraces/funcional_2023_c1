@@ -10,6 +10,10 @@ foldr2 :: (a -> b -> b) -> b -> [a] -> b
 foldr2 f base []     = base
 foldr2 f base (x:xs) = f x (foldr2 f base xs) 
 
+recr :: (a -> [a] -> b -> b) -> b -> [a] -> b
+recr f base []      = base
+recr f base (x:xs)  = f x xs (recr f base xs)
+
 many :: Int -> (a -> a) -> a -> a 
 many 0 f x = x
 many n f x = f (many (n-1) f x) 
@@ -210,34 +214,55 @@ gtPrueba = GNode 10 [ GNode 2 [ GNode 5 [], GNode 6 [] ] , GNode 3 [ GNode 7 [] 
 foldGT :: (a -> c -> b) -> ([b] -> c) -> GTree a -> b
 foldGT g k (GNode x ts) = g x (k(map (foldGT g k) ts))
 
-
-
 mapGT :: (a -> b) -> GTree a -> GTree b
-sumGT :: GTree Int -> Int
-sizeGT :: GTree a -> Int
-heightGT :: GTree a -> Int
-preOrderGT :: GTree a -> [a]
-postOrderGT :: GTree a -> [a]
--- mirrorGT :: GTree a -> GTree a
--- countByGT :: (a -> Bool) -> GTree a -> Int
--- partitionGT :: (a -> Bool) -> GTree a -> ([a], [a])
--- zipWithGT :: (a->b->c) -> GTree a -> GTree b -> GTree c
--- caminoMasLargoGT :: GTree a -> [a]
--- todosLosCaminosGT :: GTree a -> [[a]]
--- todosLosNivelesGT :: GTree a -> [[a]]
--- caminoHastaGT :: Eq a => a -> GTree a -> [a]
--- nivelNGT :: GTree a -> Int -> [a]
-
 mapGT f = foldGT (GNode . f) id
 
+sumGT :: GTree Int -> Int
 sumGT = foldGT (+) sum
 
+sizeGT :: GTree a -> Int
 sizeGT = foldGT ((+) . const 1) sum
 
+
+heightGT :: GTree a -> Int
 heightGT = foldGT ((+) . const 1) (maxOr 0) 
     where maxOr x [] = 0
           maxOr x xs = maximum xs
 
+preOrderGT :: GTree a -> [a]
 preOrderGT = foldGT (:) concat
 
-postOrderGT = foldGT  ((flip (++)) . (:[])) (concat . reverse)
+postOrderGT :: GTree a -> [a]
+postOrderGT = foldGT  ((flip (++)) . (:[])) (concat . reverse) --Definido como foldGT
+
+postOrderGT' :: GTree a -> [a]
+postOrderGT' = reverse . preOrderGT --Mejor version
+
+mirrorGT :: GTree a -> GTree a
+mirrorGT = foldGT GNode reverse
+
+countByGT :: (a -> Bool) -> GTree a -> Int
+countByGT p = foldGT ((+) . (delta . p)) sum
+
+partitionGT :: (a -> Bool) -> GTree a -> ([a], [a])
+partitionGT p = foldGT agregar concatPar
+    where agregar x ps = case p x of 
+                            True -> mixPares ([x], []) ps
+                            False -> mixPares ([], [x]) ps
+
+mixPares :: ([a], [b]) -> ([a], [b]) -> ([a],[b])
+mixPares (x,y) p = overFst (x++) (overSnd (y++) p)
+
+concatPar :: [([a], [b])] -> ([a], [b])
+concatPar = foldr2 mixPares ([],[])
+
+-- zipWithGT :: (a->b->c) -> GTree a -> GTree b -> GTree c
+-- zipWithGT f = foldGT combinar 
+--     where combinar x rts (GNode y ts) = GNode (f x y) (rts ts)
+
+caminoMasLargoGT :: GTree a -> [a]
+
+-- todosLosCaminosGT :: GTree a -> [[a]]
+-- todosLosNivelesGT :: GTree a -> [[a]]
+-- caminoHastaGT :: Eq a => a -> GTree a -> [a]
+-- nivelNGT :: GTree a -> Int -> [a]
