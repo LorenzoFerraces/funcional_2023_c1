@@ -1,3 +1,4 @@
+
 data ExpA = Cte Int | Suma ExpA ExpA | Prod ExpA ExpA
     deriving Show
 
@@ -178,11 +179,11 @@ caminoMasLargo = foldT masLargo []
                                     True -> x : tis
                                     _    -> x : tds
 
-todosLosCaminos = foldT agregar []
-    where agregar x tis tds = (foldr2 ((:) . (x:)) [[x]]) (tis ++ tds)
+todosLosCaminos = foldT agregarRaiz []
+    where agregarRaiz x tis tds = (foldr2 ((:) . (x:)) [[x]]) (tis ++ tds)
 
-todosLosNiveles = foldT juntar []
-    where juntar x tis tds = [x] : juntarListas2 tis tds
+todosLosNiveles = foldT juntarNivel []
+    where juntarNivel x tis tds = [x] : juntarListas2 tis tds
 
 nivelN = (foldT tomarNivel (const []))
     where tomarNivel x tis tds n = case n==0 of 
@@ -199,6 +200,10 @@ gtPrueba = GNode 10 [ GNode 2 [ GNode 5 [], GNode 6 [] ] , GNode 3 [ GNode 7 [] 
 
 -- foldGT0 :: (a->[b]->b) -> GTree a -> b
 -- foldGT0 h (GNode x ts) = h x (map (foldGT0 h) ts)
+
+-- recGT0 :: (a -> [GTree a] -> [b] -> b) -> GTree a -> b
+
+-- recGT1 ::
 
 -- sumGT0 :: GTree Int -> Int
 -- sumGT0 = foldGT0 (flip ((+) . sum))
@@ -261,8 +266,26 @@ concatPar = foldr2 mixPares ([],[])
 --     where combinar x rts (GNode y ts) = GNode (f x y) (rts ts)
 
 caminoMasLargoGT :: GTree a -> [a]
+caminoMasLargoGT = foldGT (:) maximumByLength
 
--- todosLosCaminosGT :: GTree a -> [[a]]
+maximumByLength :: [[a]] -> [a]
+maximumByLength = recr elMasLargo []
+                    where elMasLargo x [] rs = x
+                          elMasLargo x (ys:yss) r =  case length x > length r of
+                                                        True -> x
+                                                        _    -> r
+
+
+todosLosCaminosGT :: GTree a -> [[a]]
+todosLosCaminosGT = foldGT agregarRaiz concat
+                where agregarRaiz x ys = foldr2 ((:) . (x:)) [[x]] ys
+
 -- todosLosNivelesGT :: GTree a -> [[a]]
+-- todosLosNivelesGT = foldGT agregarN concat
+--                 where agregarN x ys =
+
 -- caminoHastaGT :: Eq a => a -> GTree a -> [a]
 -- nivelNGT :: GTree a -> Int -> [a]
+
+xsss1 :: [[[Int]]]
+xsss1 = [[[1,2,3,4], [5,6,7,8], [9,10,11]]]
