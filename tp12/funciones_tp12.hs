@@ -287,5 +287,53 @@ todosLosCaminosGT = foldGT agregarRaiz concat
 -- caminoHastaGT :: Eq a => a -> GTree a -> [a]
 -- nivelNGT :: GTree a -> Int -> [a]
 
-xsss1 :: [[[Int]]]
-xsss1 = [[[1,2,3,4], [5,6,7,8], [9,10,11]]]
+
+
+
+-- 8) 
+
+type Name = String
+type Content = String
+type Path = [Name]
+data FileSystem = File Name Content | Folder Name [FileSystem]
+
+files :: FileSystem
+files = Folder "C/" 
+            [Folder "Desktop" 
+                [Folder "fac" [
+                    File "func" "tarea", 
+                    File "OpSis" "tarea"
+                    ], 
+                Folder "oc" [
+                    Folder "cpu" [
+                        File "r23" "score"
+                        ], 
+                    Folder "gpu" 
+                        [File "unigine" "score"]],
+                Folder "pkmn"
+                    [File "plat" "save", 
+                    File "emerald" "save", 
+                    File "black" "save"]
+                ]]
+
+
+foldFS :: (Name -> Content -> a) -> (Name -> c -> a) -> ([a] -> c) -> FileSystem -> a
+foldFS fFile fFolder _ (File n c) = fFile n c
+foldFS fFile fFolder k (Folder n fSyss) = fFolder n (k(map (foldFS fFile fFolder k) fSyss))
+
+
+amountOfFiles :: FileSystem -> Int
+--  que describe la cantidad de archivos en el filesystem dado.
+amountOfFiles = foldFS (const (const 1)) (((+) . (const 1))) sum 
+
+-- find :: Name -> FileSystem -> Maybe Content
+--  que describe el contenido del archivo con el nombre dado en el filesystem dado.
+
+-- pathOf :: Name -> FileSystem -> Path
+--  que describe la ruta desde la raiz hasta el nombre dado en el filesystem dado. Precondición: el nombre existe en el filesystem.
+
+-- mapContents :: (Content -> Content) -> FileSystem -> FileSystem
+--  que describe el filesystem resultante de transformar todos los archivos en el filesystem dado aplicando la función dada.
+
+-- targetedMapContents :: [(Name, Content -> Content)] -> FileSystem -> FileSystem
+--  que describe el filesystem resultante de transformar el filesystem dado aplicando la función asociada a cada archivo en la lista dada.
