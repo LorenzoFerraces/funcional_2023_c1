@@ -13,7 +13,7 @@ jobs:
     strategy:
       matrix:
         cabal: ["3.4"]
-        ghc: ["8.8.4", "8.10.5", "9.0.1"]
+        ghc: ["9.0.1"]
     steps:
     - uses: actions/checkout@v3
     - uses: haskell/actions/setup@v1.2
