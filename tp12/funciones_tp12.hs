@@ -1,3 +1,4 @@
+import Data.Maybe (isNothing)
 
 data ExpA = Cte Int | Suma ExpA ExpA | Prod ExpA ExpA
     deriving Show
@@ -318,16 +319,33 @@ files = Folder "C/"
 
 
 foldFS :: (Name -> Content -> a) -> (Name -> c -> a) -> ([a] -> c) -> FileSystem -> a
-foldFS fFile fFolder _ (File n c) = fFile n c
+foldFS fFile fFolder _ (File n c)       = fFile n c
 foldFS fFile fFolder k (Folder n fSyss) = fFolder n (k(map (foldFS fFile fFolder k) fSyss))
+
+recFS :: (Name -> Content -> a) -> (Name -> [FileSystem] -> c -> a) -> ([a] -> c) -> FileSystem -> a
+recFS fFile fFolder _ (File n c)        = fFile n c
+recFS fFile fFolder k (Folder n fSyss) = fFolder n fSyss (k(map (recFS fFile fFolder k) fSyss))
 
 
 amountOfFiles :: FileSystem -> Int
 --  que describe la cantidad de archivos en el filesystem dado.
-amountOfFiles = foldFS (const (const 1)) (((+) . (const 1))) sum 
+amountOfFiles = foldFS (const (const 1)) (((+) . (const 0))) sum 
 
--- find :: Name -> FileSystem -> Maybe Content
+find :: Name -> FileSystem -> Maybe Content
 --  que describe el contenido del archivo con el nombre dado en el filesystem dado.
+find n = recFS fFile fFolder orMaybe
+                                where fFile m c= case n==m of 
+                                                True -> Just c
+                                                _    -> Nothing
+                                      fFolder m fs rs = rs
+
+orMaybe :: [Maybe a] -> Maybe a 
+orMaybe = foldr2 (\x -> \y -> if (isNothing2 y) then x else y) Nothing
+
+isNothing2 :: Maybe a -> Bool
+isNothing2 Nothing = True
+isNothing2 _ = False
+
 
 -- pathOf :: Name -> FileSystem -> Path
 --  que describe la ruta desde la raiz hasta el nombre dado en el filesystem dado. Precondición: el nombre existe en el filesystem.
@@ -337,3 +355,4 @@ amountOfFiles = foldFS (const (const 1)) (((+) . (const 1))) sum
 
 -- targetedMapContents :: [(Name, Content -> Content)] -> FileSystem -> FileSystem
 --  que describe el filesystem resultante de transformar el filesystem dado aplicando la función asociada a cada archivo en la lista dada.
+ 
