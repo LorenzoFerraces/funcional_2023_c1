@@ -12,7 +12,6 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v3
-    - uses: haskell/actions/setup@v1.2
     - run: cabal v2-update
     - run: cabal v2-build
     - run: cabal v2-test
