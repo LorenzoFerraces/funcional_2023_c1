@@ -9,14 +9,14 @@ on:
 
 jobs:
   build:
-
     runs-on: windows-latest
-
+    strategy:
+      matrix:
+        cabal: ["3.4"]
+        ghc: ["8.8.4", "8.10.5", "9.0.1"]
     steps:
     - uses: actions/checkout@v3
-    - name: Build
-      run: 
-        cabal build --enable-tests --enable-benchmarks all
-    - name: Run tests
-      run: 
-        cabal run all
+    - uses: haskell/actions/setup@v1.2
+    - run: cabal v2-update
+    - run: cabal v2-build
+    - run: cabal v2-test
