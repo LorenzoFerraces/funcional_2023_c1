@@ -13,5 +13,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - run: cabal v2-update
-    - run: cabal v2-build
     - run: cabal v2-run 
