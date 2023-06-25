@@ -21,10 +21,10 @@ jobs:
         cabal update
         cabal build --only-dependencies --enable-tests --enable-benchmarks
     - name: Build
-      run: 
+      run: |
         cd testCabal
         cabal build --enable-tests --enable-benchmarks all
     - name: Run tests
-      run: 
+      run: |
         cd testCabal
         cabal run all
