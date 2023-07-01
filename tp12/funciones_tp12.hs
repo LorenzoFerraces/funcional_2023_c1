@@ -1,4 +1,3 @@
-import Data.Maybe (isNothing)
 
 data ExpA = Cte Int | Suma ExpA ExpA | Prod ExpA ExpA
     deriving Show
