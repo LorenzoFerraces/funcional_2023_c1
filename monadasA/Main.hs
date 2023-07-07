@@ -18,7 +18,7 @@ probar i = do print (prueba i)
               print (pruebaMP1 i)
               print (pruebaMP2 i)
               print (pruebaMP3 i)
-              -- print (pruebaMPE i)
+              print (pruebaMPE i)
 
 prueba :: Int -> Float
 prueba 0 = eval ej0
@@ -60,7 +60,7 @@ pruebaMP3 0 = evalMP ej0
 pruebaMP3 1 = evalMP ej1
 pruebaMP3 2 = evalMP ej2
 
--- pruebaMPE :: Int -> <<poner acá el nombre de tu monada>> Float
--- pruebaMPE 0 = eval PE ej0
--- pruebaMPE 1 = evalMPE ej1
--- pruebaMPE 2 = evalMPE ej2
+pruebaMPE :: Int -> OutputError Float
+pruebaMPE 0 = evalMPE ej0
+pruebaMPE 1 = evalMPE ej1
+pruebaMPE 2 = evalMPE ej2

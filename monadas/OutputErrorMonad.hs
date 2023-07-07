@@ -1,2 +1,0 @@
-module OutputErrorMonad where
--- COMPLETAR

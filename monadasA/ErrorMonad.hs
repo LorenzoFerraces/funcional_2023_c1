@@ -1,5 +1,6 @@
 module ErrorMonad where
 import Monadas
+
 data Error a = Throw String | Ok a deriving Show
 
 instance Monad Error where
